@@ -31,12 +31,12 @@ public class DeterministicSelector {
         int pivot = getPivot(a, left, right);
         int[] p = partition(a, left, right, pivot);
 
-        if (k < p[0]) {
-            return select(a, left, p[0] - 1, k, depth + 1);
+        if (k <= p[0]) {
+            return select(a, left, p[0], k, depth + 1);
         }
 
-        if (k > p[1]) {
-            return select(a, p[1] + 1, right, k, depth + 1);
+        if (k >= p[1]) {
+            return select(a, p[1], right, k, depth + 1);
         }
 
         return a[k];
@@ -58,6 +58,7 @@ public class DeterministicSelector {
             insertionSort(a, i, end);
 
             int middle = i + (end - i) / 2;
+
             swap(a, left + count, middle);
             count++;
         }
