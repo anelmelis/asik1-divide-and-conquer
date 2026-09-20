@@ -77,6 +77,28 @@ public class Experiment {
                                     quickSorter.getComparisons() + "," +
                                     quickSorter.getSwaps() + "\n"
                     );
+
+
+                    int[] selectArray = a.clone();
+                    DeterministicSelector selector = new DeterministicSelector();
+                    int k = size / 2;
+                    start = System.nanoTime();
+                    selector.select(selectArray, k);
+                    end = System.nanoTime();
+
+                    System.out.println(
+                            "Select: n=" + size +
+                                    ", time=" + (end - start) +
+                                    " ns, depth=" + selector.getMaxDepth() +
+                                    ", comparisons=" + selector.getComparisons()
+                    );
+
+                    writer.write(
+                            "DeterministicSelect," + type + "," + size + "," +
+                                    (end - start) + "," +
+                                    selector.getMaxDepth() + "," +
+                                    selector.getComparisons() + ",0\n"
+                    );
                 }
 
                 System.out.println();
