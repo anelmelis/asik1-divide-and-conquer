@@ -54,6 +54,30 @@ public class AlgorithmTest {
     }
 
     @Test
+    void randomSortingTest() {
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            int size = random.nextInt(100) + 1;
+            int[] a = new int[size];
+
+            for (int j = 0; j < size; j++) {
+                a[j] = random.nextInt(1000);
+            }
+            int[] expected = a.clone();
+            Arrays.sort(expected);
+            int[] mergeArray = a.clone();
+            int[] quickArray = a.clone();
+
+            MergeSorter mergeSorter = new MergeSorter();
+            QuickSorter quickSorter = new QuickSorter();
+            mergeSorter.sort(mergeArray);
+            quickSorter.sort(quickArray);
+            assertArrayEquals(expected, mergeArray);
+            assertArrayEquals(expected, quickArray);
+        }
+    }
+
+    @Test
     void selectTest() {
         DeterministicSelector selector = new DeterministicSelector();
 
