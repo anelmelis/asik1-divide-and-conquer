@@ -1,5 +1,8 @@
 package dividendconquer;
+
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClosestPairSolver {
 
@@ -14,75 +17,102 @@ public class ClosestPairSolver {
             return Double.POSITIVE_INFINITY;
         }
 
-        Point[] a = points.clone();
-        Point[] temp = new Point[a.length];
+        Point[] byX = points.clone();
+        Point[] byY = points.clone();
 
-        Arrays.sort(a, (p1, p2) -> Double.compare(p1.x, p2.x));
+        Arrays.sort(byX, (a, b) -> Double.compare(a.x, b.x));
+        Arrays.sort(byY, (a, b) -> Double.compare(a.y, b.y));
 
-        return closest(a, temp, 0, a.length - 1, 1);
+        return closest(byX, byY, 1);
     }
 
-    private double closest(Point[] a, Point[] temp,
-                           int left, int right, int depth) {
+    private double closest(Point[] byX, Point[] byY, int depth) {
 
         if (depth > maxDepth) {
             maxDepth = depth;
         }
 
-        int n = right - left + 1;
+        int n = byX.length;
 
         if (n <= 3) {
-            return bruteForce(a, left, right);
+            return bruteForce(byX);
         }
 
-        int mid = left + (right - left) / 2;
+        int mid = n / 2;
 
-        double d1 = closest(a, temp, left, mid, depth + 1);
-        double d2 = closest(a, temp, mid + 1, right, depth + 1);
+        Point[] leftX = Arrays.copyOfRange(byX, 0, mid);
+        Point[] rightX = Arrays.copyOfRange(byX, mid, n);
 
-        double d = Math.min(d1, d2);
-        double middleX = a[mid].x;
+        Set<Point> leftPoints = new HashSet<>(Arrays.asList(leftX));
 
-        int count = 0;
+        Point[] leftY = new Point[mid];
+        Point[] rightY = new Point[n - mid];
 
-        for (int i = left; i <= right; i++) {
-            if (Math.abs(a[i].x - middleX) < d) {
-                temp[count] = a[i];
-                count++;
+        int leftCount = 0;
+        int rightCount = 0;
+
+        for (Point point : byY) {
+
+            if (leftPoints.contains(point)) {
+                leftY[leftCount] = point;
+                leftCount++;
+            } else {
+                rightY[rightCount] = point;
+                rightCount++;
             }
         }
 
-        Arrays.sort(temp, 0, count,
-                (p1, p2) -> Double.compare(p1.y, p2.y));
+        double leftDistance = closest(leftX, leftY, depth + 1);
+        double rightDistance = closest(rightX, rightY, depth + 1);
 
-        for (int i = 0; i < count; i++) {
-            for (int j = i + 1; j < count; j++) {
+        double distance = Math.min(leftDistance, rightDistance);
 
-                if (temp[j].y - temp[i].y >= d) {
+        double middleX = byX[mid].x;
+
+        Point[] strip = new Point[n];
+        int stripSize = 0;
+
+        for (Point point : byY) {
+
+            if (Math.abs(point.x - middleX) < distance) {
+                strip[stripSize] = point;
+                stripSize++;
+            }
+        }
+
+        for (int i = 0; i < stripSize; i++) {
+
+            for (int j = i + 1; j < stripSize; j++) {
+
+                if (strip[j].y - strip[i].y >= distance) {
                     break;
                 }
 
                 comparisons++;
 
-                double current = distance(temp[i], temp[j]);
+                double currentDistance =
+                        getDistance(strip[i], strip[j]);
 
-                if (current < d) {
-                    d = current;
+                if (currentDistance < distance) {
+                    distance = currentDistance;
                 }
             }
         }
 
-        return d;
+        return distance;
     }
 
-    private double bruteForce(Point[] a, int left, int right) {
+    private double bruteForce(Point[] points) {
+
         double best = Double.POSITIVE_INFINITY;
 
-        for (int i = left; i <= right; i++) {
-            for (int j = i + 1; j <= right; j++) {
+        for (int i = 0; i < points.length; i++) {
+
+            for (int j = i + 1; j < points.length; j++) {
+
                 comparisons++;
 
-                double current = distance(a[i], a[j]);
+                double current = getDistance(points[i], points[j]);
 
                 if (current < best) {
                     best = current;
@@ -93,7 +123,8 @@ public class ClosestPairSolver {
         return best;
     }
 
-    private double distance(Point a, Point b) {
+    private double getDistance(Point a, Point b) {
+
         double dx = a.x - b.x;
         double dy = a.y - b.y;
 
@@ -108,4 +139,3 @@ public class ClosestPairSolver {
         return maxDepth;
     }
 }
-

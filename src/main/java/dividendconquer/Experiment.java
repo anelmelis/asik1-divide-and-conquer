@@ -99,6 +99,47 @@ public class Experiment {
                                     selector.getMaxDepth() + "," +
                                     selector.getComparisons() + ",0\n"
                     );
+
+
+                    Point[] points = new Point[size];
+                    for (int i = 0; i < size; i++) {
+                        if (type.equals("random")) {
+                            points[i] = new Point(
+                                    random.nextDouble() * 100000,
+                                    random.nextDouble() * 100000
+                            );
+                        } else if (type.equals("sorted")) {
+                            points[i] = new Point(i, i);
+                        } else if (type.equals("reverse")) {
+                            points[i] = new Point(size - i, i);
+                        } else {
+                            points[i] = new Point(
+                                    random.nextInt(10),
+                                    random.nextInt(10)
+                            );
+                        }
+                    }
+
+                    ClosestPairSolver closestPairSolver = new ClosestPairSolver();
+
+                    start = System.nanoTime();
+                    closestPairSolver.findClosest(points);
+                    end = System.nanoTime();
+
+                    System.out.println(
+                            "ClosestPair: n=" + size +
+                                    ", time=" + (end - start) +
+                                    " ns, depth=" + closestPairSolver.getMaxDepth() +
+                                    ", comparisons=" + closestPairSolver.getComparisons()
+                    );
+
+                    writer.write(
+                            "ClosestPair," + type + "," + size + "," +
+                                    (end - start) + "," +
+                                    closestPairSolver.getMaxDepth() + "," +
+                                    closestPairSolver.getComparisons() + ",0\n"
+                    );
+
                 }
 
                 System.out.println();
@@ -109,6 +150,5 @@ public class Experiment {
             System.out.println("Error writing CSV: " + e.getMessage());
         }
         }
-
 
 }
